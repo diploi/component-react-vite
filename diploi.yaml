@@ -1,0 +1,31 @@
+diploiVersion: v1.0
+type: component
+name: React + Vite
+description: Official Diploi component for React + Vite
+
+contexts:
+  - name: app
+    identifier: app
+
+hosts:
+  - name: React
+    identifier: react
+    urlFormat: '[label].[default-domain]'
+
+images:
+  - identifier: app
+    repository: app
+    dockerfile: Dockerfile
+    image: ghcr.io/diploi/component-react-vite
+    stages:
+      - development
+      - production
+      - staging
+    manualBuildStages:
+      - development
+
+storage:
+  - identifier: app
+    stages:
+      - development
+    sizeMiB: 6144

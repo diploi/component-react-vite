@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  labels:
+    app: app
+spec:
+  selector:
+    matchLabels:
+      app: app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  replicas: {{ ternary 1 0 .Values.enabled }}
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      terminationGracePeriodSeconds: 10
+      imagePullSecrets:
+        - name: diploi-pull-secret
+      containers:
+        - name: app
+          image: {{ .Values.images.app }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: 500Mi
+            limits:
+              memory: 1000Mi
+          env:
+            {{ range $key, $val := .Values.parameterGroupsEnabled }}
+            {{ if $val }}
+            - name: parameter_group_{{ $key }}_enabled
+              value: "1"
+            {{ end }}
+            {{ end }}
+            {{- range .Values.env }}
+            {{- if contains "app" .contexts }}
+            - name: {{ .identifier }}
+              value: {{ .value | quote }}
+            {{- end }}
+            {{- end }}
+            {{- range .Values.parameterGroups }}
+            - name: {{ .identifier }}
+              value: {{ .value | quote }}
+            {{- end }}
+            - name: APP_PUBLIC_URL
+              value: {{ .Values.hosts.app }}
+            - name: STAGE
+              value: {{ .Values.stage }}
+          volumeMounts:
+            {{- if hasKey .Values.storage "app" }}
+            - name: app-mount
+              mountPath: /app
+            {{- end }}
+      volumes:
+        {{- if hasKey .Values.storage "app" }}
+        - name: app-mount
+          hostPath:
+            path: {{ .Values.storage.app.hostPath }}/app
+        {{- end }}
