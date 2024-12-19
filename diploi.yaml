@@ -12,18 +12,6 @@ hosts:
     identifier: react
     urlFormat: '[label].[default-domain]'
 
-images:
-  - identifier: app
-    repository: app
-    dockerfile: Dockerfile
-    image: ghcr.io/diploi/component-react-vite
-    stages:
-      - development
-      - production
-      - staging
-    manualBuildStages:
-      - development
-
 storage:
   - identifier: app
     stages:
