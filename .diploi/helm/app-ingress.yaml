@@ -7,10 +7,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - { { .Values.hosts.app } }
+        - {{ .Values.hosts.app }}
       secretName: tls-secret
   rules:
-    - host: { { .Values.hosts.app } }
+    - host: {{ .Values.hosts.app }}
       http:
         paths:
           - path: '/'
