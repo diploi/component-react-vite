@@ -31,12 +31,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set tags
+        id: set-tags
+        run: |
+          TAGS="${{ steps.meta.outputs.tags }}"
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            TAGS="${TAGS},${{ env.REGISTRY }}/${{ github.repository }}:latest"
+          fi
+          echo "tags=$TAGS" >> $GITHUB_ENV
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           push: ${{ github.event_name != 'pull_request' }}
           platforms: linux/arm64
-          tags: |
-            ${{ steps.meta.outputs.tags }}
-            ${{ github.ref == 'refs/heads/main' && env.REGISTRY + '/' + github.repository + ':latest' || '' }}
+          tags: ${{ env.tags }}
           labels: ${{ steps.meta.outputs.labels }}
