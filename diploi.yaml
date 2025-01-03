@@ -12,6 +12,10 @@ hosts:
     identifier: react
     urlFormat: '[label].[default-domain]'
 
+images:
+  - identifier: app
+    prebuildImage: ghcr.io/diploi/component-nextjs
+
 storage:
   - identifier: app
     stages:
