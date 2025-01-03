@@ -14,7 +14,7 @@ hosts:
 
 images:
   - identifier: app
-    prebuildImage: ghcr.io/diploi/component-nextjs
+    prebuildImage: ghcr.io/diploi/component-react-vite
 
 storage:
   - identifier: app
