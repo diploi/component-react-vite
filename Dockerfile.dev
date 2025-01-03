@@ -22,13 +22,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+USER node
+EXPOSE 5173
+ENV PORT=5173
 
-# Production image, copy all the built files
-FROM nginx:1.27.2-alpine AS runner
-COPY --from=builder /app/dist /usr/share/nginx/html
+ENV HOSTNAME="0.0.0.0"
+CMD ["npm", "run", "dev"]
