@@ -8,8 +8,8 @@ contexts:
     identifier: app
 
 hosts:
-  - name: React
-    identifier: react
+  - name: App
+    identifier: app
     urlFormat: '[label].[default-domain]'
 
 images:
