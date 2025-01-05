@@ -14,7 +14,7 @@ hosts:
 
 images:
   - identifier: app
-    prebuildImage: ghcr.io/diploi/component-react-vite
+    prebuildImage: ghcr.io/diploi/component-react-vite[:tag]
 
 storage:
   - identifier: app
