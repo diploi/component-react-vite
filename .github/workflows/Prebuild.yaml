@@ -48,6 +48,8 @@ jobs:
           platforms: linux/arm64
           tags: ${{ env.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            FOLDER=./
 
   development:
     name: 'Development'
@@ -93,3 +95,5 @@ jobs:
           platforms: linux/arm64
           tags: ${{ env.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            FOLDER=./
