@@ -1,7 +1,8 @@
-FROM node:22-alpine AS base
-
 # This will be set by the GitHub action to the folder containing this component.
 ARG FOLDER=/app
+
+FROM node:22-alpine AS base
+ARG FOLDER
 
 # Install dependencies only when needed
 FROM base AS deps
