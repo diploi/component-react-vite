@@ -15,9 +15,3 @@ hosts:
 images:
   - identifier: app
     prebuildImage: ghcr.io/diploi/component-react-vite:[tag]
-
-storage:
-  - identifier: app
-    stages:
-      - development
-    sizeMiB: 6144
