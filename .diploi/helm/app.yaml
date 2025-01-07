@@ -22,6 +22,20 @@ spec:
       terminationGracePeriodSeconds: 10
       imagePullSecrets:
         - name: diploi-pull-secret
+      {{- if eq .Values.stage "development"}}
+      initContainers:
+        - name: install-dependencies
+          image: ghcr.io/diploi/component-react-vite:main
+          imagePullPolicy: Always
+          command: ['npm', 'install']
+          workingDir: /app/{{ .Values.identifier }}
+          env:
+          - name: NODE_ENV
+            value: development
+          volumeMounts:
+            - name: app-mount
+              mountPath: /app
+      {{- end }}
       containers:
         - name: app
           image: {{ .Values.images.app }}
