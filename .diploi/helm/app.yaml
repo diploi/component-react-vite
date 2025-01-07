@@ -80,13 +80,13 @@ spec:
             - name: STAGE
               value: {{ .Values.stage }}
           volumeMounts:
-            {{- if hasKey .Values.storage "app" }}
+            {{- if hasKey .Values.storage "code" }}
             - name: app-mount
               mountPath: /app
             {{- end }}
       volumes:
-        {{- if hasKey .Values.storage "app" }}
+        {{- if hasKey .Values.storage "code" }}
         - name: app-mount
           hostPath:
-            path: {{ .Values.storage.app.hostPath }}/app
+            path: {{ .Values.storage.code.hostPath }}
         {{- end }}
