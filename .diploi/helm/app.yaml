@@ -47,7 +47,7 @@ spec:
               memory: 500Mi
             limits:
               memory: 1000Mi
-          {{- if not eq .Values.stage "development"}}
+          {{- if not (eq .Values.stage "development") }}
           workingDir: /app/{{ .Values.identifier }}
           {{- end }}
           env:
