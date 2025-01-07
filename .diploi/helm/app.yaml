@@ -33,7 +33,7 @@ spec:
       {{- if eq .Values.stage "development"}}
       initContainers:
         - name: install-dependencies
-          image: ghcr.io/diploi/component-react-vite:main
+          image: {{ .Values.images.app }}
           imagePullPolicy: Always
           command: ['npm', 'install']
           workingDir: /app/{{ .Values.identifier }}
@@ -46,7 +46,7 @@ spec:
       {{- end }}
       containers:
         - name: app
-          image: ghcr.io/diploi/component-react-vite:main
+          image: {{ .Values.images.app }}
           imagePullPolicy: Always
           ports:
             - containerPort: 80
