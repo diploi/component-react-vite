@@ -20,7 +20,7 @@ RUN \
 FROM base AS builder
 COPY . .
 WORKDIR $FOLDER
-COPY --from=deps $FOLDER/node_modules ./node_modules
+COPY --from=deps ${FOLDER}/node_modules ./node_modules
 
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
@@ -31,4 +31,4 @@ RUN \
 
 # Production image, copy all the built files
 FROM nginx:1.27.2-alpine AS runner
-COPY --from=builder $FOLDER/dist /usr/share/nginx/html
+COPY --from=builder ${FOLDER}/dist /usr/share/nginx/html

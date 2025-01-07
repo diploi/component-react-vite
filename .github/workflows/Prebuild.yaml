@@ -49,7 +49,7 @@ jobs:
           tags: ${{ env.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            FOLDER=./
+            FOLDER=.
 
   development:
     name: 'Development'
@@ -96,4 +96,4 @@ jobs:
           tags: ${{ env.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            FOLDER=./
+            FOLDER=.
