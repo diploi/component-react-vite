@@ -12,11 +12,15 @@ spec:
   selector:
     matchLabels:
       app: app
+  {{- if eq .Values.stage "development"}}
+  serviceName: app
+  {{- else }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 25%
       maxSurge: 25%
+  {{- end }}
   replicas: {{ ternary 1 0 .Values.enabled }}
   template:
     metadata:
