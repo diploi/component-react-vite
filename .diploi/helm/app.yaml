@@ -30,9 +30,23 @@ spec:
       terminationGracePeriodSeconds: 10
       imagePullSecrets:
         - name: diploi-pull-secret
+      {{- if eq .Values.stage "development"}}
+      initContainers:
+        - name: install-dependencies
+          image: ghcr.io/diploi/component-react-vite:main
+          imagePullPolicy: Always
+          command: ['npm', 'install']
+          workingDir: /app/{{ .Values.identifier }}
+          env:
+          - name: NODE_ENV
+            value: development
+          volumeMounts:
+            - name: app-mount
+              mountPath: /app
+      {{- end }}
       containers:
         - name: app
-          image: {{ .Values.images.app }}
+          image: ghcr.io/diploi/component-react-vite:main
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -41,6 +55,9 @@ spec:
               memory: 500Mi
             limits:
               memory: 1000Mi
+          {{- if not (eq .Values.stage "development") }}
+          workingDir: /app/{{ .Values.identifier }}
+          {{- end }}
           env:
             {{ range $key, $val := .Values.parameterGroupsEnabled }}
             {{ if $val }}
