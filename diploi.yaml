@@ -12,6 +12,11 @@ hosts:
     identifier: app
     urlFormat: '[label].[default-domain]'
 
+logs:
+  - name: Vite Log
+    type: log
+    labelSelector: app=app
+
 images:
   - identifier: app
     prebuildImage: ghcr.io/diploi/component-react-vite:[tag]
