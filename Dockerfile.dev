@@ -7,10 +7,14 @@ ARG FOLDER=/app
 RUN apk add --no-cache libc6-compat
 
 COPY . /app
-
 WORKDIR ${FOLDER}
+
+ENV NODE_ENV=development
+
+USER 1000:1000
 
 EXPOSE 5173
 ENV PORT=5173
 ENV HOSTNAME="0.0.0.0"
+
 CMD ["npm", "run", "dev"]
