@@ -62,19 +62,7 @@ spec:
           workingDir: /app/{{ .Values.identifier }}
           {{- end }}
           env:
-            {{ range $key, $val := .Values.parameterGroupsEnabled }}
-            {{ if $val }}
-            - name: parameter_group_{{ $key }}_enabled
-              value: "1"
-            {{ end }}
-            {{ end }}
             {{- range .Values.env }}
-            {{- if contains "app" .contexts }}
-            - name: {{ .identifier }}
-              value: {{ .value | quote }}
-            {{- end }}
-            {{- end }}
-            {{- range .Values.parameterGroups }}
             - name: {{ .identifier }}
               value: {{ .value | quote }}
             {{- end }}
