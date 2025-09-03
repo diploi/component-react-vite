@@ -1,15 +1,16 @@
-# React + TypeScript + Vite Component for Diploi
+<img alt="icon" src=".diploi/icon.svg" width="32">
+
+# React + Vite Component for Diploi
+
+[![launch with diploi badge](https://diploi.com/launch.svg)](https://diploi.com/component/react-vite)
+[![component on diploi badge](https://diploi.com/component.svg)](https://diploi.com/component/react-vite)
+[![latest tag badge](https://badgen.net/github/tag/diploi/component-react-vite)](https://diploi.com/component/react-vite)
 
 Want to start a quick demo? Use this link
 https://diploi.com/component/react-vite
 No account required
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
 ## Operation
 
@@ -23,44 +24,17 @@ Currently, two official plugins are available:
 
 For more details, check https://diploi.com/blog/hosting_react_apps
 
-## Expanding the ESLint configuration
+### Development
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Will run `npm install` when component is first initialized, and `npm run dev` when deployment is started.
 
-- Configure the top-level `parserOptions` property like this:
+### Production
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Will build a production ready image. Image runs `npm install` & `npm run build` when being created. The created `/dist` folder will be served as a static site with [nginx](https://nginx.org/).
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Links
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+- [React documentation](https://react.dev/)
+- [Vite documentation](https://vite.dev/)
+- [nginx documentation](https://nginx.org/)
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
