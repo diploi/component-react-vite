@@ -27,8 +27,8 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=tag
-          flavor: |
-            latest=auto
+            # Set latest tag for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: 'Login to GitHub Container Registry'
         uses: docker/login-action@v3
@@ -65,8 +65,9 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=tag
+            # Set latest tag for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
           flavor: |
-            latest=auto
             suffix=-dev.,onlatest=true
 
       - name: 'Login to GitHub Container Registry'
