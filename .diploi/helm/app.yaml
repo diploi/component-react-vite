@@ -39,7 +39,7 @@ spec:
           image: {{ .Values.images.app }}
           imagePullPolicy: Always
           command: ['npm', 'install']
-          workingDir: /app/{{ .Values.identifier }}
+          workingDir: /app{{ .Values.folder }}
           env:
           - name: NODE_ENV
             value: development
@@ -59,7 +59,7 @@ spec:
             limits:
               memory: 1000Mi
           {{- if eq .Values.stage "development" }}
-          workingDir: /app/{{ .Values.identifier }}
+          workingDir: /app{{ .Values.folder }}
           {{- end }}
           env:
             {{- range .Values.env }}
