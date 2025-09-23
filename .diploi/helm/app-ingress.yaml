@@ -19,4 +19,4 @@ spec:
               service:
                 name: app
                 port:
-                  number: {{ ternary 5173 80 (eq .Values.stage "development") }}
+                  number: 8080
