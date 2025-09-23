@@ -1,7 +1,7 @@
 # This will be set by the GitHub action to the folder containing this component.
 ARG FOLDER=/app
 
-FROM node:22-alpine AS base
+FROM node:24-slim AS base
 ARG FOLDER
 
 # Install dependencies only when needed
@@ -34,6 +34,6 @@ RUN \
   fi
 
 # Production image, copy all the built files
-FROM nginx:1.27.2-alpine AS runner
+FROM nginx:1.29.1-alpine AS runner
 ARG FOLDER
 COPY --from=builder ${FOLDER}/dist /usr/share/nginx/html
