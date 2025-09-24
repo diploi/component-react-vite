@@ -52,7 +52,7 @@ spec:
           image: {{ .Values.images.app }}
           imagePullPolicy: Always
           ports:
-            - containerPort: {{ ternary 8080 80 (eq .Values.stage "development") }}
+            - containerPort: {{ ternary 5173 80 (eq .Values.stage "development") }}
           resources:
             requests:
               memory: 500Mi

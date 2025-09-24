@@ -3,20 +3,15 @@ type: component
 name: React + Vite
 description: Official Diploi component for React + Vite
 
-contexts:
-  - name: app
-    identifier: app
-
 hosts:
   - name: App
     identifier: app
     urlFormat: '[label].[default-domain]'
 
-logs:
-  - name: Vite Log
-    type: log
-    labelSelector: app=app
-
 images:
   - identifier: app
     prebuildImage: ghcr.io/diploi/component-react-vite:[tag]
+
+environmentVariables:
+  - identifier: __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+    defaultValue: '.diploi.me'

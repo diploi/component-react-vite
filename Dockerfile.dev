@@ -10,8 +10,6 @@ ENV NODE_ENV=development
 
 USER 1000:1000
 
-EXPOSE 8080
-ENV PORT=8080
-ENV HOSTNAME="0.0.0.0"
+EXPOSE 5173
 
 CMD ["npm", "run", "dev"]
