@@ -34,6 +34,7 @@ Will build a production ready image. Image runs `npm install` & `npm run build` 
 
 ## Links
 
+- [Adding React-Vite to a project](https://docs.diploi.com/building/components/react-vite)
 - [React documentation](https://react.dev/)
 - [Vite documentation](https://vite.dev/)
 - [nginx documentation](https://nginx.org/)
