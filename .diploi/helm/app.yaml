@@ -44,7 +44,7 @@ spec:
             - |
               if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
               elif [ -f package-lock.json ]; then npm ci; \
-              elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+              elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; \
               else echo "Lockfile not found. Skipping install."; \
               fi
           workingDir: /app{{ .Values.folder }}
@@ -54,6 +54,37 @@ spec:
           volumeMounts:
             - name: app-mount
               mountPath: /app
+      {{- end }}
+      {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq .Values.envMap.__VITE_RUNTIME_BUILD "true") }}
+      initContainers:
+        - name: runtime-build
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          image: {{ .Values.images.app }}
+          imagePullPolicy: Always
+          env:
+            {{- range .Values.env }}
+            - name: {{ .identifier }}
+              value: {{ .value | quote }}
+            {{- end }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              if [ -f yarn.lock ]; then yarn run build; \
+              elif [ -f package-lock.json ]; then npm run build; \
+              elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
+              else echo "Lockfile not found." && exit 1; \
+              fi &&
+              find /build -mindepth 1 -exec rm -rf {} + &&
+              DEST=$(pwd | awk '{sub("/app","/build");print}') &&
+              mkdir -p $DEST &&
+              cp -rv ./dist $DEST ||: &&
+              chown -R 1000:1000 /build
+          volumeMounts:
+            - name: build-mount
+              mountPath: /build
       {{- end }}
       containers:
         - name: app
@@ -74,13 +105,13 @@ spec:
             - name: {{ .identifier }}
               value: {{ .value | quote }}
             {{- end }}
-            - name: APP_PUBLIC_URL
-              value: {{ .Values.hosts.app }}
-            - name: STAGE
-              value: {{ .Values.stage }}
           volumeMounts:
             {{- if hasKey .Values.storage "code" }}
             - name: app-mount
+              mountPath: /app
+            {{- end }}
+            {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq .Values.envMap.__VITE_RUNTIME_BUILD "true") }}
+            - name: build-mount
               mountPath: /app
             {{- end }}
       volumes:
@@ -88,4 +119,9 @@ spec:
         - name: app-mount
           hostPath:
             path: {{ .Values.storage.code.hostPath }}
+        {{- end }}
+        {{- if hasKey .Values.storage "build" }}
+        - name: build-mount
+          hostPath:
+            path: {{ .Values.storage.build.hostPath }}
         {{- end }}
