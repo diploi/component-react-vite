@@ -30,12 +30,36 @@ Will run `npm install` when component is first initialized, and `npm run dev` wh
 
 ### Production
 
-Will build a production ready image. Image runs `npm install` & `npm run build` when being created. The created `/dist` folder will be served as a static site with [nginx](https://nginx.org/).
+Builds a production-ready image. The image runs `npm install` and `npm run build` in a GitHub Action during creation.
+
+The generated `/dist` folder is served as a static site using [serve](https://github.com/vercel/serve).
+
+#### ENV
+
+Since Vite embeds environment variables during the build step, we provide two ways to manage ENV values in production builds:
+
+1. For values that are not deployment-dependent, define them in `diploi.yaml` using the [static import syntax](https://docs.diploi.com/reference/diploi-yaml#env).
+2. For values that depend on a specific deployment (such as variables imported from other components in `diploi.yaml`, or configured in the **Options** tab), enable the **runtime build** option.
+
+#### Runtime Build
+
+When runtime build is enabled, `npm run build` is executed again when the container starts. This ensures that environment variables from the running deployment are correctly applied, and that any data loaded from other components can use the internal network.
+
+To enable runtime build, set `__VITE_RUNTIME_BUILD` to `true` in `diploi.yaml`:
+
+```yaml
+- name: React + Vite
+  identifier: react
+  package: https://github.com/diploi/component-react-vite#v19.2.10
+  env:
+    include:
+      - name: __VITE_RUNTIME_BUILD
+        value: true
+```
 
 ## Links
 
 - [Adding React-Vite to a project](https://docs.diploi.com/building/components/react-vite)
 - [React documentation](https://react.dev/)
 - [Vite documentation](https://vite.dev/)
-- [nginx documentation](https://nginx.org/)
-
+- [serve documentation](https://github.com/vercel/serve)
