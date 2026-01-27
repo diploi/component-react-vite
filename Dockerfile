@@ -16,6 +16,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 # Install dependencies only when needed
 FROM base AS deps
+ARG FOLDER
 
 COPY . /app
 WORKDIR ${FOLDER}
@@ -30,6 +31,7 @@ RUN \
 
 # Rebuild the source code only when needed
 FROM base AS builder
+ARG FOLDER
 COPY . /app
 WORKDIR ${FOLDER}
 COPY --from=deps ${FOLDER}/node_modules ./node_modules
@@ -41,11 +43,19 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-# Production image, copy all the built files
-# NOTE: Build will be run again in an init-container if "__VITE_RUNTIME_BUILD" ARG is "true"
-FROM base AS runner
+# When "__VITE_RUNTIME_BUILD" is false, only ship the built assets.
+FROM base AS runner-false
+ARG FOLDER
+COPY --from=builder --chown=1000:1000 ${FOLDER}/dist ${FOLDER}/dist
 
+# When "__VITE_RUNTIME_BUILD" is true, include entire app code. Build will be run again in an init-container.
+FROM base AS runner-true
+ARG FOLDER
 COPY --from=builder --chown=1000:1000 /app /app
+
+FROM runner-${__VITE_RUNTIME_BUILD} AS runner
+ARG FOLDER
+
 WORKDIR ${FOLDER}
 
 ENV NODE_ENV=production
