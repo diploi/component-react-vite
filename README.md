@@ -38,7 +38,7 @@ The generated `/dist` folder is served as a static site using [serve](https://gi
 
 Since Vite embeds environment variables during the build step, we provide two ways to manage ENV values in production builds:
 
-1. For values that are not deployment-dependent, define them in `diploi.yaml` using the [static import syntax](https://docs.diploi.com/reference/diploi-yaml#env).
+1. For values that are not deployment-dependent, define them in `diploi.yaml` using the [static import syntax](https://docs.diploi.com/reference/diploi-yaml#env). The values are exposed to the `Dockerfile` as `ARG` variables.
 2. For values that depend on a specific deployment (such as variables imported from other components in `diploi.yaml`, or configured in the **Options** tab), enable the **runtime build** option.
 
 #### Runtime Build
@@ -49,7 +49,7 @@ To enable runtime build, set `__VITE_RUNTIME_BUILD` to `true` in `diploi.yaml`:
 
 ```yaml
 - name: React + Vite
-  identifier: react
+  identifier: react-vite
   package: https://github.com/diploi/component-react-vite#v19.2.10
   env:
     include:
