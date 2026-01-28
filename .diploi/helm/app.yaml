@@ -107,9 +107,9 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
             - name: DEBUG_1
-              value: {{ .Values.stage "development" | quote }}
+              value: {{ .Values.stage | quote }}
             - name: DEBUG_2
-              value: {{ .Values.storage "build" | quote }}
+              value: {{ .Values.storage | quote }}
             - name: DEBUG_3
               value: {{ $runtimeBuild }}
           volumeMounts:
