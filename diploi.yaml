@@ -6,7 +6,6 @@ description: Official Diploi component for React + Vite
 hosts:
   - name: App
     identifier: app
-    urlFormat: '[label].[default-domain]'
 
 images:
   - identifier: app
@@ -15,3 +14,10 @@ images:
 environmentVariables:
   - identifier: __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
     defaultValue: '.diploi.me'
+
+storage:
+  - identifier: build
+    sizeMiB: 8192
+    stages:
+      - staging
+      - production

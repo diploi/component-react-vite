@@ -3,6 +3,16 @@ ARG FOLDER=/app
 
 FROM node:24-slim AS base
 
+# Enable corepack
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable
+
+# Setup PNPM
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN mkdir -p /home/codespace/.pnpm-store /pnpm \
+ && chown -R 1000:1000 /home/codespace/.pnpm-store /pnpm
+
 COPY . /app
 WORKDIR ${FOLDER}
 
