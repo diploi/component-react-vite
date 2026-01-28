@@ -106,6 +106,12 @@ spec:
             - name: {{ .identifier }}
               value: {{ .value | quote }}
             {{- end }}
+            - name: DEBUG_1
+              value: {{ .Values.stage "development" | quote }}
+            - name: DEBUG_2
+              value: {{ .Values.storage "build" | quote }}
+            - name: DEBUG_3
+              value: {{ $runtimeBuild }}
           volumeMounts:
             {{- if hasKey .Values.storage "code" }}
             - name: app-mount
