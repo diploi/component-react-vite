@@ -55,7 +55,10 @@ spec:
             - name: app-mount
               mountPath: /app
       {{- end }}
-      {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq (toString .Values.envMap.__VITE_RUNTIME_BUILD.value) "true") }}
+      {{- if and (ne .Values.stage "development")
+                 (hasKey .Values.storage "build")
+                 (hasKey .Values.envMap "__VITE_RUNTIME_BUILD")
+                 (eq (toString (default "" ((index .Values.envMap "__VITE_RUNTIME_BUILD").value))) "true") }}
       initContainers:
         - name: runtime-build
           securityContext:
@@ -105,16 +108,15 @@ spec:
             - name: {{ .identifier }}
               value: {{ .value | quote }}
             {{- end }}
-            - name: DEBUG_1
-              value: {{ .Values.stage | quote }}
-            - name: DEBUG_2
-              value: {{ .Values.storage | quote }}
           volumeMounts:
             {{- if hasKey .Values.storage "code" }}
             - name: app-mount
               mountPath: /app
             {{- end }}
-            {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq (toString .Values.envMap.__VITE_RUNTIME_BUILD.value) "true") }}
+            {{- if and (ne .Values.stage "development")
+                       (hasKey .Values.storage "build")
+                       (hasKey .Values.envMap "__VITE_RUNTIME_BUILD")
+                       (eq (toString (default "" ((index .Values.envMap "__VITE_RUNTIME_BUILD").value))) "true") }}
             - name: build-mount
               mountPath: /app
             {{- end }}
