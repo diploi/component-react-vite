@@ -55,7 +55,7 @@ spec:
             - name: app-mount
               mountPath: /app
       {{- end }}
-      {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq (toString .Values.envMap.__VITE_RUNTIME_BUILD) "true") }}
+      {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq (toString .Values.envMap.__VITE_RUNTIME_BUILD.value) "true") }}
       initContainers:
         - name: runtime-build
           securityContext:
@@ -114,7 +114,7 @@ spec:
             - name: app-mount
               mountPath: /app
             {{- end }}
-            {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq (toString .Values.envMap.__VITE_RUNTIME_BUILD) "true") }}
+            {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq (toString .Values.envMap.__VITE_RUNTIME_BUILD.value) "true") }}
             - name: build-mount
               mountPath: /app
             {{- end }}
