@@ -1,3 +1,4 @@
+{{- $runtimeBuild := printf "%v" (default "" (get (default dict .Values.envMap) "__VITE_RUNTIME_BUILD")) -}}
 apiVersion: apps/v1
 {{- if eq .Values.stage "development"}}
 kind: StatefulSet
@@ -9,7 +10,6 @@ metadata:
   labels:
     app: app
 spec:
-  {{- $runtimeBuild := printf "%v" (default "" (get (default dict .Values.envMap) "__VITE_RUNTIME_BUILD")) }}
   selector:
     matchLabels:
       app: app
