@@ -81,7 +81,8 @@ spec:
               DEST=$(pwd | awk '{sub("/app","/build");print}') &&
               mkdir -p $DEST &&
               cp -rv ./dist $DEST ||: &&
-              chown -R 1000:1000 /build
+              chown -R 1000:1000 /build &&
+              printenv
           volumeMounts:
             - name: build-mount
               mountPath: /build
