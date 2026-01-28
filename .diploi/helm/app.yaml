@@ -75,7 +75,7 @@ spec:
               if [ -f yarn.lock ]; then yarn run build; \
               elif [ -f package-lock.json ]; then npm run build; \
               elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
-              else echo "Lockfile not found." && exit 1; \
+              else echo "Lockfile not found. Skipping runtime build. This usually means the image was built without __VITE_RUNTIME_BUILD set to true in diploi.yaml. See the README for details." && exit 1; \
               fi &&
               find /build -mindepth 1 -exec rm -rf {} + &&
               DEST=$(pwd | awk '{sub("/app","/build");print}') &&
