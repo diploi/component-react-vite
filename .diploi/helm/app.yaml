@@ -1,4 +1,3 @@
-{{- $runtimeBuild := printf "%v" (default "" (get (default dict .Values.envMap) "__VITE_RUNTIME_BUILD")) -}}
 apiVersion: apps/v1
 {{- if eq .Values.stage "development"}}
 kind: StatefulSet
@@ -56,7 +55,7 @@ spec:
             - name: app-mount
               mountPath: /app
       {{- end }}
-      {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq $runtimeBuild "true") }}
+      {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq (toString .Values.envMap.__VITE_RUNTIME_BUILD) "true") }}
       initContainers:
         - name: runtime-build
           securityContext:
@@ -110,14 +109,12 @@ spec:
               value: {{ .Values.stage | quote }}
             - name: DEBUG_2
               value: {{ .Values.storage | quote }}
-            - name: DEBUG_3
-              value: {{ $runtimeBuild }}
           volumeMounts:
             {{- if hasKey .Values.storage "code" }}
             - name: app-mount
               mountPath: /app
             {{- end }}
-            {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq $runtimeBuild "true") }}
+            {{- if and (ne .Values.stage "development") (hasKey .Values.storage "build") (eq (toString .Values.envMap.__VITE_RUNTIME_BUILD) "true") }}
             - name: build-mount
               mountPath: /app
             {{- end }}
