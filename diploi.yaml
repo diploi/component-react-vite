@@ -3,9 +3,12 @@ type: component
 name: React + Vite
 description: Official Diploi component for React + Vite
 
+supportsAdditionalHosts: { serviceName: 'app' }
+
 hosts:
   - name: App
     identifier: app
+    port: 5173
 
 images:
   - identifier: app

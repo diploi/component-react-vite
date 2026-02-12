@@ -66,8 +66,8 @@ ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 ENV PATH=$PATH:/home/node/.npm-global/bin
 RUN npm i -g serve
 
-EXPOSE 80
-ENV PORT=80
+EXPOSE 5173
+ENV PORT=5173
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["serve", "-s", "-l", "80", "dist"]
+CMD ["serve", "-s", "-l", "5173", "dist"]

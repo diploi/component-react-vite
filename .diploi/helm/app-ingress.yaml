@@ -5,18 +5,24 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
+  {{- if .Values.endpoints }}
   tls:
     - hosts:
-        - {{ .Values.hosts.app }}
+      {{- range .Values.endpoints }}
+      - {{ .url }}
+      {{- end }}
       secretName: tls-secret
   rules:
-    - host: {{ .Values.hosts.app }}
+    {{- range .Values.endpoints }}
+    - host: {{ .url }}
       http:
         paths:
           - path: '/'
             pathType: Prefix
             backend:
               service:
-                name: app
+                name: {{ .serviceName }}
                 port:
-                  number: {{ ternary 5173 80 (eq .Values.stage "development") }}
+                  number: {{ .port }}
+    {{- end }}
+  {{- end }}
