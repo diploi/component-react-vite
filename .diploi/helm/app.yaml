@@ -43,14 +43,16 @@ spec:
             - -c
             - |
               if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-              elif [ -f package-lock.json ]; then npm ci; \
+              elif [ -f package-lock.json ]; then npm ci || npm i; \
               elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; \
               else echo "Lockfile not found. Skipping install."; \
               fi
           workingDir: /app{{ .Values.folder }}
           env:
-          - name: NODE_ENV
-            value: development
+            - name: NODE_ENV
+              value: development
+            - name: __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+              value: .diploi.me
           volumeMounts:
             - name: app-mount
               mountPath: /app
