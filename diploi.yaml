@@ -14,10 +14,6 @@ images:
   - identifier: app
     prebuildImage: public.ecr.aws/p8t2q7f4/diploi/component-react-vite:[tag]
 
-environmentVariables:
-  - identifier: __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
-    defaultValue: '.diploi.me'
-
 storage:
   - identifier: build
     sizeMiB: 8192
