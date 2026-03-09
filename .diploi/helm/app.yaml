@@ -51,8 +51,6 @@ spec:
           env:
             - name: NODE_ENV
               value: development
-            - name: __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
-              value: .diploi.me
           volumeMounts:
             - name: app-mount
               mountPath: /app
@@ -106,6 +104,8 @@ spec:
           workingDir: /app{{ .Values.folder }}
           {{- end }}
           env:
+            - name: __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+              value: .diploi.me
             {{- range .Values.env }}
             - name: {{ .identifier }}
               value: {{ .value | quote }}
