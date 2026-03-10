@@ -24,8 +24,8 @@ WORKDIR ${FOLDER}
 # Install dependencies based on the preferred package manager
 RUN \
   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; \
+  elif [ -f package-lock.json ]; then npm ci || npm i; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile || pnpm i; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
