@@ -102,6 +102,19 @@ spec:
               memory: 1000Mi
           {{- if eq .Values.stage "development" }}
           workingDir: /app{{ .Values.folder }}
+          {{- with .Values.containerCommands.developmentStart }}
+          command:
+            - /bin/sh
+            - -c
+            - "{{ . }}"
+          {{- end }}
+          {{- else }}
+          {{- with .Values.containerCommands.productionStart }}
+          command:
+            - /bin/sh
+            - -c
+            - "{{ . }}"
+          {{- end }}
           {{- end }}
           env:
             - name: __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
