@@ -43,10 +43,7 @@ spec:
           - -c
           - |
             if [ -f yarn.lock ]; then
-              if ! yarn --frozen-lockfile; then
-                echo "Retrying yarn install without frozen lockfile"
-                yarn install
-              fi
+              yarn --frozen-lockfile || yarn install
             elif [ -f package-lock.json ]; then
               npm ci || npm install
             elif [ -f pnpm-lock.yaml ]; then
