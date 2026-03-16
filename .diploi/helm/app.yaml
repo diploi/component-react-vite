@@ -45,7 +45,11 @@ spec:
               if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
               elif [ -f package-lock.json ]; then npm ci || npm i; \
               elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile || pnpm i; \
-              else echo "Lockfile not found. Skipping install."; \
+              elif [ -f package.json ]; then
+                echo "Lockfile not found. Falling back to npm i (non-deterministic install).";
+                npm i;
+              else
+                echo "No package manifest found. Skipping install.";
               fi
           workingDir: /app{{ .Values.folder }}
           env:
