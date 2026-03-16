@@ -39,23 +39,24 @@ spec:
           image: {{ .Values.images.app }}
           imagePullPolicy: Always
           command:
-            - /bin/sh
-            - -c
-            - |
-              if [ -f yarn.lock ]; then 
-                yarn --frozen-lockfile 
-                if [ $? -ne 0 ]; then
-                  echo "Retrying yarn install without frozen lockfile"
-                  yarn install
-                fi
-              elif [ -f package-lock.json ]; then npm ci || npm i; \
-              elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile || pnpm i; \
-              elif [ -f package.json ]; then
-                echo "Lockfile not found. Falling back to npm i (non-deterministic install).";
-                npm i;
-              else
-                echo "No package manifest found. Skipping install.";
+          - /bin/sh
+          - -c
+          - |
+            if [ -f yarn.lock ]; then
+              if ! yarn --frozen-lockfile; then
+                echo "Retrying yarn install without frozen lockfile"
+                yarn install
               fi
+            elif [ -f package-lock.json ]; then
+              npm ci || npm install
+            elif [ -f pnpm-lock.yaml ]; then
+              pnpm install --frozen-lockfile || pnpm install
+            elif [ -f package.json ]; then
+              echo "Lockfile not found. Falling back to npm install (non-deterministic install)."
+              npm install
+            else
+              echo "No package manifest found. Skipping install."
+            fi
           workingDir: /app{{ .Values.folder }}
           env:
             - name: NODE_ENV
