@@ -42,7 +42,12 @@ spec:
             - /bin/sh
             - -c
             - |
-              if [ -f yarn.lock ]; then yarn --frozen-lockfile || yarn install; \
+              if [ -f yarn.lock ]; then 
+                yarn --frozen-lockfile 
+                if [ $? -ne 0 ]; then
+                  echo "Retrying yarn install without frozen lockfile"
+                  yarn install
+                fi
               elif [ -f package-lock.json ]; then npm ci || npm i; \
               elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile || pnpm i; \
               elif [ -f package.json ]; then
