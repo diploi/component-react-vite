@@ -113,14 +113,16 @@ spec:
           command:
             - /bin/sh
             - -c
-            - "{{ . }}"
+            - |
+          {{ . | nindent 14 }}
           {{- end }}
           {{- else }}
           {{- with .Values.containerCommands.productionStart }}
           command:
             - /bin/sh
             - -c
-            - "{{ . }}"
+            - |
+          {{ . | nindent 14 }}
           {{- end }}
           {{- end }}
           env:
