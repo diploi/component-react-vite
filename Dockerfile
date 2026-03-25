@@ -25,7 +25,7 @@ WORKDIR ${FOLDER}
 
 # Install dependencies based on the preferred package manager
 RUN \
-  if [ -f bun.lockb ] || [ -f bun.lock ]; then bun install --frozen-lockfile || bun install; 
+  if [ -f bun.lockb ] || [ -f bun.lock ]; then bun install --frozen-lockfile || bun install; \
   elif [ -f yarn.lock ]; then yarn install --frozen-lockfile || yarn install; \
   elif [ -f package-lock.json ]; then npm ci || npm i; \
   elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile || pnpm i; \
