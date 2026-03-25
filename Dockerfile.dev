@@ -13,6 +13,8 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN mkdir -p /home/codespace/.pnpm-store /pnpm \
  && chown -R 1000:1000 /home/codespace/.pnpm-store /pnpm
 
+COPY --from=oven/bun:1.3.11 /usr/local/bin/bun /usr/local/bin/bun
+
 COPY . /app
 WORKDIR ${FOLDER}
 

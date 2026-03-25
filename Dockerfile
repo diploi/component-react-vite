@@ -14,6 +14,8 @@ RUN corepack enable
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
+COPY --from=oven/bun:1.3.11 /usr/local/bin/bun /usr/local/bin/bun
+
 # Install dependencies only when needed
 FROM base AS deps
 ARG FOLDER
@@ -23,7 +25,8 @@ WORKDIR ${FOLDER}
 
 # Install dependencies based on the preferred package manager
 RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+  if [ -f bun.lockb ] || [ -f bun.lock ]; then bun install --frozen-lockfile || bun install; 
+  elif [ -f yarn.lock ]; then yarn install --frozen-lockfile || yarn install; \
   elif [ -f package-lock.json ]; then npm ci || npm i; \
   elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile || pnpm i; \
   else echo "Lockfile not found." && exit 1; \
@@ -37,7 +40,8 @@ WORKDIR ${FOLDER}
 COPY --from=deps ${FOLDER}/node_modules ./node_modules
 
 RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
+  if [ -f bun.lockb ] || [ -f bun.lock ]; then bun run build; \
+  elif [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
   elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
   else echo "Lockfile not found." && exit 1; \
