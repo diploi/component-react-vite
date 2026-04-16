@@ -66,8 +66,7 @@ spec:
       {{- end }}
       {{- if and (ne .Values.stage "development")
                  (hasKey .Values.storage "build")
-                 (hasKey .Values.envMap "__VITE_RUNTIME_BUILD")
-                 (eq (toString (default "" ((index .Values.envMap "__VITE_RUNTIME_BUILD").value))) "true") }}
+                 (eq (toString (default "true" ((index .Values.envMap "__VITE_RUNTIME_BUILD").value))) "true") }}
       initContainers:
         - name: runtime-build
           securityContext:
@@ -141,8 +140,7 @@ spec:
             {{- end }}
             {{- if and (ne .Values.stage "development")
                        (hasKey .Values.storage "build")
-                       (hasKey .Values.envMap "__VITE_RUNTIME_BUILD")
-                       (eq (toString (default "" ((index .Values.envMap "__VITE_RUNTIME_BUILD").value))) "true") }}
+                       (eq (toString (default "true" ((index .Values.envMap "__VITE_RUNTIME_BUILD").value))) "true") }}
             - name: build-mount
               mountPath: /app
             {{- end }}

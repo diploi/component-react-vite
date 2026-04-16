@@ -2,7 +2,7 @@
 ARG FOLDER=/app
 
 # This will be set by the GitHub action if "__VITE_RUNTIME_BUILD" ENV is set in diploi.yaml
-ARG __VITE_RUNTIME_BUILD=false
+ARG __VITE_RUNTIME_BUILD=true
 
 FROM node:24-slim AS base
 

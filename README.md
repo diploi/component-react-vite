@@ -43,9 +43,9 @@ Since Vite embeds environment variables during the build step, we provide two wa
 
 #### Runtime Build
 
-When runtime build is enabled, `npm run build` is executed again when the container starts. This ensures that environment variables from the running deployment are correctly applied, and that any data loaded from other components can use the internal network.
+When runtime build is enabled (which it is by default), `npm run build` is executed again when the container starts. This ensures that environment variables from the running deployment are correctly applied, and that any data loaded from other components can use the internal network.
 
-To enable runtime build, set `__VITE_RUNTIME_BUILD` to `true` in `diploi.yaml`:
+To disable runtime build, set `__VITE_RUNTIME_BUILD` to `false` in `diploi.yaml`:
 
 ```yaml
 - name: React + Vite
@@ -54,7 +54,7 @@ To enable runtime build, set `__VITE_RUNTIME_BUILD` to `true` in `diploi.yaml`:
   env:
     include:
       - name: __VITE_RUNTIME_BUILD
-        value: true
+        value: false
 ```
 
 ## Links
