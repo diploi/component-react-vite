@@ -8,9 +8,6 @@ spec:
   selector:
     matchLabels:
       app: app
-  {{- if eq .Values.stage "development"}}
-  serviceName: app
-  {{- else }}
   strategy:
   {{- if eq .Values.stage "development"}}
     type: Recreate
