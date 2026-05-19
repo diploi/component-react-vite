@@ -11,8 +11,7 @@ RUN corepack enable
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 # Apply PNPM settings to be consistent with devcontainer
-ENV NPM_CONFIG_STORE_DIR=/home/codespace/.pnpm-store
-ENV NPM_CONFIG_NODE_LINKER=hoisted
+ENV PNPM_STORE_DIR=/home/codespace/.pnpm-store
 RUN mkdir -p /home/codespace/.pnpm-store /pnpm \
     && chown -R 1000:1000 /home/codespace/.pnpm-store /pnpm
 
