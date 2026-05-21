@@ -12,7 +12,10 @@ RUN corepack enable
 
 # Setup PNPM
 ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+ENV PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
+ENV CI=true
+ENV PNPM_CONFIG_MINIMUM_RELEASE_AGE=0
+ENV PNPM_CONFIG_STRICT_DEP_BUILDS=false
 
 COPY --from=oven/bun:1.3.11 /usr/local/bin/bun /usr/local/bin/bun
 

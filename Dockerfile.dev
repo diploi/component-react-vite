@@ -9,20 +9,25 @@ RUN corepack enable
 
 # Setup PNPM
 ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-# Apply PNPM settings to be consistent with devcontainer
-ENV PNPM_STORE_DIR=/home/codespace/.pnpm-store
+ENV PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
 RUN mkdir -p /home/codespace/.pnpm-store /pnpm \
     && chown -R 1000:1000 /home/codespace/.pnpm-store /pnpm
 
 COPY --from=oven/bun:1.3.11 /usr/local/bin/bun /usr/local/bin/bun
 
-COPY . /app
 WORKDIR ${FOLDER}
 
 ENV NODE_ENV=development
 
 USER 1000:1000
+
+# Apply PNPM settings to be consistent with devcontainer
+ENV CI=true
+ENV PNPM_CONFIG_NODE_LINKER=hoisted
+ENV PNPM_CONFIG_MINIMUM_RELEASE_AGE=0
+ENV PNPM_CONFIG_STRICT_DEP_BUILDS=false
+ENV PNPM_CONFIG_CONFIRM_MODULES_PURGE=false
+RUN pnpm config set store-dir /home/codespace/.pnpm-store --global
 
 EXPOSE 5173
 
