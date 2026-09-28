@@ -38,7 +38,7 @@ spec:
           - /bin/sh
           - -c
           - |
-            if [ -f bun.lock ]; then
+            if [ -f bun.lockb ] || [ -f bun.lock ]; then
               bun install --frozen-lockfile || bun install
             elif [ -f yarn.lock ]; then
               yarn install --frozen-lockfile || yarn install
@@ -79,7 +79,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              if [ -f bun.lock ]; then
+              if [ -f bun.lockb ] || [ -f bun.lock ]; then
                 bun run build
               elif [ -f yarn.lock ]; then
                 yarn run build
@@ -130,7 +130,7 @@ spec:
           {{- end }}
           env:
             - name: __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
-              value: .diploi.me
+              value: ".diploi.me,.{{ .Release.Namespace }}"
             {{- range .Values.env }}
             - name: {{ .identifier }}
               value: {{ .value | quote }}
