@@ -27,8 +27,8 @@ and the code runs in the browser, where `process.env` does not exist.
   `<HOST>_INTERNAL_ENDPOINT`.
 - Staging and production use a **runtime build** by default: each time the component starts, it runs
   `npm run build` again with the deployment's env vars and serves the result. A changed value only reaches the
-  bundle when the component restarts. If that build fails, the component still starts and keeps serving its previous
-  build without reporting an error, so run `npm run build` before calling a change done.
+  bundle when the component restarts. If that build fails, the new version of the component does not start, so run
+  `npm run build` before calling a change done.
 - With `__VITE_RUNTIME_BUILD` set to `false` in the component's `env.include` in `diploi.yaml`, the build made in the
   image is served instead. It has none of the deployment's env vars, only the static values from `diploi.yaml`, and
   `vite build` only sees those once they are declared with `ARG` in the `builder` stage of `Dockerfile`.
