@@ -29,7 +29,7 @@ Prefer the full guide? Check https://diploi.com/blog/hosting_react_apps
 
 ### Package managers
 
-Supports **Bun**, **Yarn**, **npm**, and **pnpm**. The package manager is auto-detected from your lockfile (`bun.lock`, `yarn.lock`, `package-lock.json`, or `pnpm-lock.yaml`). The install and build steps always use the detected package manager.
+Supports **Bun**, **Yarn**, **npm**, and **pnpm**. The package manager is the one `packageManager` in your `package.json` names, or else the one your lockfile belongs to (`bun.lock`, `pnpm-lock.yaml`, `yarn.lock` or `package-lock.json`). The install and build steps always use it, at the version `packageManager` names.
 
 ### Development
 

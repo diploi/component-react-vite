@@ -17,12 +17,4 @@ images:
 # Staging and production build the deployment's commit on its own machine, in the image above, with the deployment's
 # environment. Development runs the dev server on the working copy instead
 build:
-  command: |
-    set -e
-    if [ -f bun.lock ] || [ -f bun.lockb ]; then PM=bun; bun install --frozen-lockfile || bun install
-    elif [ -f pnpm-lock.yaml ]; then PM=pnpm; pnpm install --frozen-lockfile || pnpm install
-    elif [ -f yarn.lock ]; then PM=yarn; yarn install --frozen-lockfile || yarn install
-    elif [ -f package-lock.json ]; then PM=npm; npm ci || npm install
-    else PM=npm; npm install
-    fi
-    NODE_ENV=production $PM run build
+  command: diploi-pm install && NODE_ENV=production diploi-pm run build
