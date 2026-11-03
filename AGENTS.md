@@ -12,6 +12,8 @@ A client-side [React](https://react.dev/) app built with [Vite](https://vite.dev
   development server through `server.port` in `vite.config.ts`, and `serve -s -l $PORT dist` in staging and
   production. To change the port, change only the host's `port`. Never hardcode one: staging and production count a
   version as ready once it accepts connections on `PORT`, and one that listens elsewhere never becomes ready.
+- In staging and production the project folder is read-only while `serve` runs. Nothing in this component writes files:
+  data the app keeps belongs in another component.
 - Development runs `npm run dev -- --host`. Staging and production build the commit with `npm run build`, which is
   `tsc -b && vite build`, so a type error fails the build.
 - The development server already allows the Diploi hosts. Add any other host to `server.allowedHosts` in

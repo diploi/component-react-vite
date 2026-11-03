@@ -53,6 +53,8 @@ serve -s -l $PORT dist
 
 This can be changed with the `containerCommands.productionStart` field in `diploi.yaml`. See [Ports](#ports).
 
+In staging and production the project folder is read-only while `serve` runs. The app runs in the browser and writes no files: data it keeps belongs in another component, such as a backend with a database.
+
 #### ENV
 
 Vite replaces [`import.meta.env.VITE_*`](https://vite.dev/guide/env-and-mode) with the values of those environment variables during the build step. Only variables with the `VITE_` prefix are exposed to your code, and everything they contain is visible in the browser, so never give a secret a `VITE_` name.
