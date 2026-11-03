@@ -19,6 +19,10 @@ A client-side [React](https://react.dev/) app built with [Vite](https://vite.dev
 - The development server already allows the Diploi hosts. Add any other host to `server.allowedHosts` in
   `vite.config.ts`, and never set it to `true`.
 - `npm run lint` runs Oxlint, configured in `.oxlintrc.json`. The project has no ESLint.
+- npm only runs a dependency's install script once the project approves it (`npm install-scripts approve <package>`,
+  saved per version in `allowScripts` of `package.json`, so again after an upgrade), as pnpm (`onlyBuiltDependencies`)
+  and Bun (`trustedDependencies`) do. A package that needs its script, such as Prisma for `prisma generate`, otherwise
+  installs incomplete without an error: approve it when adding it.
 
 ## Environment variables and the runtime build
 
