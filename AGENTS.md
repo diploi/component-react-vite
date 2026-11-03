@@ -8,8 +8,9 @@ A client-side [React](https://react.dev/) app built with [Vite](https://vite.dev
 - There is no server code and no SSR. Staging and production serve the static build in `dist/` with `serve -s`,
   which answers unknown paths with `index.html`, so client-side routing works. Anything that needs a server, a secret
   or a database belongs in another component.
-- Serves on port **5173** in every stage: the Vite default in development, and `serve -l 5173` in `Dockerfile`.
-- Development runs `npm run dev -- --host` (`Dockerfile.dev`). Staging and production run `npm run build`, which is
+- Serves on port **5173** in every stage: the Vite default in development, and `serve -s -l 5173 dist` in staging and
+  production.
+- Development runs `npm run dev -- --host`. Staging and production build the commit with `npm run build`, which is
   `tsc -b && vite build`, so a type error fails the build.
 - The development server already allows the Diploi hosts. Add any other host to `server.allowedHosts` in
   `vite.config.ts`, and never set it to `true`.
@@ -25,13 +26,11 @@ and the code runs in the browser, where `process.env` does not exist.
 - To use a variable of another component, import it under a `VITE_` name in `diploi.yaml`, eg
   `api.APP_ENDPOINT:VITE_API_URL`. Use a public `<HOST>_ENDPOINT`, because the browser cannot reach a
   `<HOST>_INTERNAL_ENDPOINT`.
-- Staging and production use a **runtime build** by default: each time the component starts, it runs
-  `npm run build` again with the deployment's env vars and serves the result. A changed value only reaches the
-  bundle when the component restarts. If that build fails, the new version of the component does not start, so run
-  `npm run build` before calling a change done.
-- With `__VITE_RUNTIME_BUILD` set to `false` in the component's `env.include` in `diploi.yaml`, the build made in the
-  image is served instead. It has none of the deployment's env vars, only the static values from `diploi.yaml`, and
-  `vite build` only sees those once they are declared with `ARG` in the `builder` stage of `Dockerfile`.
+- Staging and production build each commit on the deployment, with the deployment's env vars, once: a restart reuses
+  the build, and a changed env var or a new commit builds again. If the build fails, the previous version keeps
+  running and the deployment page shows the log, so run `npm run build` before calling a change done.
+- The image holds no code and no Dockerfile is in the project. System packages go into `initScript` (every start, as
+  root) or `preBuildScript` (only the build) of the component in `diploi.yaml`.
 
 ## Documentation
 

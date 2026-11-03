@@ -17,11 +17,19 @@ spec:
       maxUnavailable: 25%
       maxSurge: 25%
   {{- end }}
+  {{- if ne .Values.stage "development" }}
+  # The first pod of a new commit builds before it is ready, and the old one serves meanwhile
+  progressDeadlineSeconds: 1800
+  {{- end }}
   replicas: {{ ternary 1 0 .Values.enabled }}
   template:
     metadata:
       labels:
         app: app
+        {{- with .Values.build }}
+        diploi.com/build-hash: {{ .hash | quote }}
+        diploi.com/commit: {{ $.Values.code.commit | quote }}
+        {{- end }}
     spec:
       terminationGracePeriodSeconds: 10
       imagePullSecrets:
@@ -60,44 +68,28 @@ spec:
             - name: app-mount
               mountPath: /app
       {{- end }}
-      {{- if and (ne .Values.stage "development")
-                 (hasKey .Values.storage "build")
-                 (eq (toString (default "true" ((index .Values.envMap "__VITE_RUNTIME_BUILD").value))) "true") }}
+      {{- if and (ne .Values.stage "development") .Values.build }}
+      # Builds the deployment's commit in its build folder, once: core writes the script (docs.diploi.com, runtime builds)
       initContainers:
-        - name: runtime-build
+        - name: build
+          image: {{ .Values.images.app }}
+          imagePullPolicy: Always
           securityContext:
             runAsUser: 0
             runAsGroup: 0
-          image: {{ .Values.images.app }}
-          imagePullPolicy: Always
+          workingDir: /app{{ .Values.folder }}
+          command: ["/bin/sh", "-c", {{ .Values.build.script | quote }}]
           env:
-            {{- range .Values.env }}
+            {{- range (concat .Values.env .Values.build.env) }}
             - name: {{ .identifier }}
               value: {{ .value | quote }}
             {{- end }}
-          command:
-            - /bin/sh
-            - -c
-            - |
-              if [ -f bun.lockb ] || [ -f bun.lock ]; then
-                bun run build
-              elif [ -f yarn.lock ]; then
-                yarn run build
-              elif [ -f pnpm-lock.yaml ]; then
-                pnpm run build
-              elif [ -f package-lock.json ]; then
-                npm run build
-              else
-                echo "Lockfile not found. Skipping runtime build. This usually means the image was built without __VITE_RUNTIME_BUILD set to true in diploi.yaml. See the README for details."
-              fi &&
-              find /build -mindepth 1 -exec rm -rf {} + &&
-              DEST=$(pwd | awk '{sub("/app","/build");print}') &&
-              mkdir -p $DEST &&
-              { cp -rv ./dist $DEST || :; } &&
-              chown -R 1000:1000 /build
+          resources:
+            limits:
+              memory: {{ .Values.build.memoryMiB }}Mi
           volumeMounts:
-            - name: build-mount
-              mountPath: /build
+            - name: build-folder
+              mountPath: /app
       {{- end }}
       containers:
         - name: app
@@ -110,8 +102,8 @@ spec:
               memory: 500Mi
             limits:
               memory: 1000Mi
-          {{- if eq .Values.stage "development" }}
           workingDir: /app{{ .Values.folder }}
+          {{- if eq .Values.stage "development" }}
           {{- with .Values.containerCommands.developmentStart }}
           command:
             - /bin/sh
@@ -120,12 +112,15 @@ spec:
           {{ . | nindent 14 }}
           {{- end }}
           {{- else }}
+          # args, not command: the image's entrypoint runs the project's initScript and then the app as uid 1000
           {{- with .Values.containerCommands.productionStart }}
-          command:
+          args:
             - /bin/sh
             - -c
             - |
           {{ . | nindent 14 }}
+          {{- else }}
+          args: ["serve", "-s", "-l", "5173", "dist"]
           {{- end }}
           {{- end }}
           env:
@@ -140,10 +135,8 @@ spec:
             - name: app-mount
               mountPath: /app
             {{- end }}
-            {{- if and (ne .Values.stage "development")
-                       (hasKey .Values.storage "build")
-                       (eq (toString (default "true" ((index .Values.envMap "__VITE_RUNTIME_BUILD").value))) "true") }}
-            - name: build-mount
+            {{- if and (ne .Values.stage "development") .Values.code }}
+            - name: build-folder
               mountPath: /app
             {{- end }}
       volumes:
@@ -152,8 +145,8 @@ spec:
           hostPath:
             path: {{ .Values.storage.code.hostPath }}
         {{- end }}
-        {{- if hasKey .Values.storage "build" }}
-        - name: build-mount
+        {{- if and (ne .Values.stage "development") .Values.code }}
+        - name: build-folder
           hostPath:
-            path: {{ .Values.storage.build.hostPath }}
+            path: {{ .Values.code.hostPath }}
         {{- end }}

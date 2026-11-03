@@ -1,10 +1,14 @@
-# This will be set by the GitHub action to the folder containing this component.
-ARG FOLDER=/app
+# syntax=docker/dockerfile:1
+# The toolchain the component runs in every stage. The code is not in the image: staging and production build the
+# deployment's commit on its own machine, development runs the working copy.
+FROM node:24-slim
 
-# This will be set by the GitHub action if "__VITE_RUNTIME_BUILD" ENV is set in diploi.yaml
-ARG __VITE_RUNTIME_BUILD=true
-
-FROM node:24-slim AS base
+# su-exec (gosu here) drops to uid 1000 after the work that needs root, and curl lets a build wait for the components
+# it depends on
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gosu curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s "$(command -v gosu)" /usr/local/bin/su-exec
 
 # Enable corepack
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
@@ -13,68 +17,38 @@ RUN corepack enable
 # Setup PNPM
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
-ENV CI=true
-ENV PNPM_CONFIG_MINIMUM_RELEASE_AGE=0
-ENV PNPM_CONFIG_STRICT_DEP_BUILDS=false
+RUN mkdir -p /home/codespace/.pnpm-store /pnpm \
+    && chown -R 1000:1000 /home/codespace/.pnpm-store /pnpm
 
-COPY --from=oven/bun:1.3.11 /usr/local/bin/bun /usr/local/bin/bun
+COPY --from=oven/bun:1.4.4 /usr/local/bin/bun /usr/local/bin/bun
 
-# Install dependencies only when needed
-FROM base AS deps
-ARG FOLDER
-
-COPY . /app
-WORKDIR ${FOLDER}
-
-# Install dependencies based on the preferred package manager
-RUN \
-  if [ -f bun.lockb ] || [ -f bun.lock ]; then bun install --frozen-lockfile || bun install; \
-  elif [ -f yarn.lock ]; then yarn install --frozen-lockfile || yarn install; \
-  elif [ -f package-lock.json ]; then npm ci || npm i; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile || pnpm i; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-# Rebuild the source code only when needed
-FROM base AS builder
-ARG FOLDER
-COPY . /app
-WORKDIR ${FOLDER}
-COPY --from=deps ${FOLDER}/node_modules ./node_modules
-
-RUN \
-  if [ -f bun.lockb ] || [ -f bun.lock ]; then bun run build; \
-  elif [ -f yarn.lock ]; then yarn run build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-# When "__VITE_RUNTIME_BUILD" is false, only ship the built assets.
-FROM base AS runner-false
-ARG FOLDER
-COPY --from=builder --chown=1000:1000 ${FOLDER}/dist ${FOLDER}/dist
-
-# When "__VITE_RUNTIME_BUILD" is true, include entire app code. Build will be run again in an init-container.
-FROM base AS runner-true
-ARG FOLDER
-COPY --from=builder --chown=1000:1000 /app /app
-
-FROM runner-${__VITE_RUNTIME_BUILD} AS runner
-ARG FOLDER
-
-WORKDIR ${FOLDER}
-
-ENV NODE_ENV=production
-
-USER 1000:1000
-
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-ENV PATH=$PATH:/home/node/.npm-global/bin
+# Serves the build in staging and production
 RUN npm i -g serve
 
-EXPOSE 5173
-ENV PORT=5173
-ENV HOSTNAME="0.0.0.0"
+# Apply PNPM settings to be consistent with devcontainer
+ENV NODE_ENV=development
+ENV CI=true
+ENV PNPM_CONFIG_NODE_LINKER=hoisted
+ENV PNPM_CONFIG_MINIMUM_RELEASE_AGE=0
+ENV PNPM_CONFIG_STRICT_DEP_BUILDS=false
+ENV PNPM_CONFIG_CONFIRM_MODULES_PURGE=false
+USER 1000:1000
+RUN pnpm config set store-dir /home/codespace/.pnpm-store --global
+USER root
 
-CMD ["serve", "-s", "-l", "5173", "dist"]
+# The project's initScript (diploi.yaml) runs as root before the app, which then runs as uid 1000. A container that
+# starts as uid 1000 (development) runs the app as it is
+COPY --chmod=755 <<'SCRIPT' /usr/local/bin/diploi-entrypoint
+#!/bin/sh
+set -e
+if [ "$(id -u)" = "0" ]; then
+  if [ -n "${DIPLOI_INIT_SCRIPT:-}" ]; then sh -c "$DIPLOI_INIT_SCRIPT"; fi
+  exec su-exec 1000:1000 "$@"
+fi
+exec "$@"
+SCRIPT
+ENTRYPOINT ["diploi-entrypoint"]
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev", "--", "--host"]

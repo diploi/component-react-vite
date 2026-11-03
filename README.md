@@ -43,7 +43,7 @@ This can be changed with the `containerCommands.developmentStart` field in `dipl
 
 ### Production
 
-Builds a production-ready image. Image runs `npm install` & `npm run build` when being created, using the detected package manager. `npm run build` type-checks the project with `tsc -b` before `vite build` writes the app to `dist/`.
+Staging and production build the deployment's commit on the deployment itself, with the deployment's environment variables: dependencies are installed with the detected package manager, then `npm run build` type-checks the project with `tsc -b` before `vite build` writes the app to `dist/`. A commit is built once; a restart of the component reuses the build. A failed build leaves the previous version running, and its log is shown on the deployment page, where the commit can also be built again.
 
 The `dist/` folder is served as a static site using [serve](https://github.com/vercel/serve):
 
@@ -57,10 +57,7 @@ This can be changed with the `containerCommands.productionStart` field in `diplo
 
 Vite replaces [`import.meta.env.VITE_*`](https://vite.dev/guide/env-and-mode) with the values of those environment variables during the build step. Only variables with the `VITE_` prefix are exposed to your code, and everything they contain is visible in the browser, so never give a secret a `VITE_` name.
 
-We provide two ways to manage ENV values in production builds:
-
-1. For values that are not deployment-dependent, define them in `diploi.yaml` using the [static import syntax](https://docs.diploi.com/reference/diploi-yaml#env). The values are exposed to the `Dockerfile` as `ARG` variables.
-2. For values that depend on a specific deployment (such as variables imported from other components in `diploi.yaml`, or configured in the **Environment** tab), enable the **runtime build** option.
+The build runs with every environment variable of the deployment: the static values in `diploi.yaml`, the ones imported from other components and the ones set in the **Environment** tab. A changed value builds the commit again.
 
 To use a variable from another component in your code, import it under a name with the `VITE_` prefix. For example, to call the public address of a backend with the `api` identifier:
 
@@ -75,20 +72,16 @@ To use a variable from another component in your code, import it under a name wi
 
 Your code runs in the browser, so use the public `<HOST>_ENDPOINT` address of a component. The `<HOST>_INTERNAL_ENDPOINT` address only works inside the deployment.
 
-#### Runtime Build
+#### System packages
 
-When runtime build is enabled (which it is by default), `npm run build` is executed again when the container starts. This ensures that environment variables from the running deployment are correctly applied, and that any data loaded from other components can use the internal network.
-
-To disable runtime build, set `__VITE_RUNTIME_BUILD` to `false` in `diploi.yaml`:
+The image has no packages beyond Node.js, Bun and pnpm. Install more with `initScript` in `diploi.yaml`, which runs as root when the component starts, or `preBuildScript`, which runs only before the build:
 
 ```yaml
 - name: React + Vite
   identifier: react-vite
   package: https://github.com/diploi/component-react-vite#v19.3.0
-  env:
-    include:
-      - name: __VITE_RUNTIME_BUILD
-        value: false
+  preBuildScript: |
+    apt-get update && apt-get install -y --no-install-recommends python3 make g++
 ```
 
 #### Ports
@@ -96,8 +89,7 @@ To disable runtime build, set `__VITE_RUNTIME_BUILD` to `false` in `diploi.yaml`
 The component serves on port **5173** in both development and production. If you change it, update all of these so they stay in sync:
 
 - `hosts[].port` in `diploi.yaml`
-- `EXPOSE` in `Dockerfile` and `Dockerfile.dev`
-- `ENV PORT` and the `-l` option of `serve` in `Dockerfile`
+- the `-l` option of `serve` and `containerPort` in `.diploi/helm/app.yaml`, or a `containerCommands.productionStart` of your own
 - `server.port` in `vite.config.ts`, which the development server uses. It is not set, because 5173 is the Vite default
 
 ## Links
