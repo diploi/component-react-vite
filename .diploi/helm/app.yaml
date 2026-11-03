@@ -86,6 +86,13 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 5173
+          {{- if ne .Values.stage "development" }}
+          # Ready once it accepts connections: the rollout and builds waiting for this one go by it
+          readinessProbe:
+            tcpSocket:
+              port: 5173
+            periodSeconds: 5
+          {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
           resources:
