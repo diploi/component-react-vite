@@ -48,10 +48,10 @@ Staging and production build the deployment's commit on the deployment itself, w
 The `dist/` folder is served as a static site using [serve](https://github.com/vercel/serve):
 
 ```sh
-serve -s -l 5173 dist
+serve -s -l $PORT dist
 ```
 
-This can be changed with the `containerCommands.productionStart` field in `diploi.yaml`.
+This can be changed with the `containerCommands.productionStart` field in `diploi.yaml`. See [Ports](#ports).
 
 #### ENV
 
@@ -86,11 +86,9 @@ The image has no packages beyond Node.js, Bun and pnpm. Install more with `initS
 
 #### Ports
 
-The component serves on port **5173** in both development and production. If you change it, update all of these so they stay in sync:
+The component serves on port **5173** in every stage. To use another one, change the `port` of its `app` host in `diploi.yaml` (`hosts: [{ identifier: app, port: 8080 }]`). Diploi passes that port to the app as the `PORT` environment variable, and both the development server (`server.port` in `vite.config.ts`) and `serve` in staging and production listen on it.
 
-- `hosts[].port` in `diploi.yaml`
-- the `-l` option of `serve` and `containerPort` in `.diploi/helm/app.yaml`, or a `containerCommands.productionStart` of your own
-- `server.port` in `vite.config.ts`, which the development server uses. It is not set, because 5173 is the Vite default
+A `containerCommands.productionStart` of your own should listen on `$PORT` too, for example `serve -s -l $PORT dist`. Staging and production count a new version as ready once it accepts connections on that port: one that listens elsewhere never becomes ready, and the previous version keeps serving.
 
 ## Links
 

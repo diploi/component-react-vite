@@ -8,8 +8,10 @@ A client-side [React](https://react.dev/) app built with [Vite](https://vite.dev
 - There is no server code and no SSR. Staging and production serve the static build in `dist/` with `serve -s`,
   which answers unknown paths with `index.html`, so client-side routing works. Anything that needs a server, a secret
   or a database belongs in another component.
-- Serves on port **5173** in every stage: the Vite default in development, and `serve -s -l 5173 dist` in staging and
-  production.
+- Listens on `PORT`, which Diploi sets to the port of the `app` host in `diploi.yaml` (**5173** unless changed): the
+  development server through `server.port` in `vite.config.ts`, and `serve -s -l $PORT dist` in staging and
+  production. To change the port, change only the host's `port`. Never hardcode one: staging and production count a
+  version as ready once it accepts connections on `PORT`, and one that listens elsewhere never becomes ready.
 - Development runs `npm run dev -- --host`. Staging and production build the commit with `npm run build`, which is
   `tsc -b && vite build`, so a type error fails the build.
 - The development server already allows the Diploi hosts. Add any other host to `server.allowedHosts` in

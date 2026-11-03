@@ -1,3 +1,6 @@
+{{- /* The port of the component's own host: the service sends to it, and the app listens on it as PORT */}}
+{{- $port := 5173 }}
+{{- range .Values.ports }}{{ if eq .identifier "app" }}{{ $port = .port }}{{ end }}{{ end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -85,12 +88,12 @@ spec:
           image: {{ .Values.images.app }}
           imagePullPolicy: Always
           ports:
-            - containerPort: 5173
+            - containerPort: {{ $port }}
           {{- if ne .Values.stage "development" }}
           # Ready once it accepts connections: the rollout and builds waiting for this one go by it
           readinessProbe:
             tcpSocket:
-              port: 5173
+              port: {{ $port }}
             periodSeconds: 5
           {{- end }}
           securityContext:
@@ -118,7 +121,7 @@ spec:
             - |
           {{ . | nindent 14 }}
           {{- else }}
-          args: ["serve", "-s", "-l", "5173", "dist"]
+          args: ["serve", "-s", "-l", "$(PORT)", "dist"]
           {{- end }}
           {{- end }}
           env:
@@ -128,6 +131,9 @@ spec:
             - name: {{ .identifier }}
               value: {{ .value | quote }}
             {{- end }}
+            # Last, so it wins over a PORT of the project's own
+            - name: PORT
+              value: {{ $port | quote }}
           volumeMounts:
             {{- if hasKey .Values.storage "code" }}
             - name: app-mount
