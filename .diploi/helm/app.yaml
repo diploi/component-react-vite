@@ -96,6 +96,13 @@ spec:
               port: {{ $port }}
             periodSeconds: 5
           {{- end }}
+          {{- if ne .Values.stage "development" }}
+          # The proxy sends requests here for a moment after this pod starts to stop. Without the wait they fail or hang
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
+          {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
           resources:
