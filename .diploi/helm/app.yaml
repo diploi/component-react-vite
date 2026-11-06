@@ -34,6 +34,7 @@ spec:
         app: app
         {{- with .Values.build }}
         diploi.com/build-hash: {{ .hash | quote }}
+        diploi.com/build-attempt: {{ .attempt | default 0 | quote }}
         diploi.com/commit: {{ $.Values.code.commit | quote }}
         {{- end }}
     spec:
